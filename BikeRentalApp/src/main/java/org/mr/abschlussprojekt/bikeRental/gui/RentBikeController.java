@@ -98,6 +98,7 @@ public class RentBikeController implements Initializable {
         // Listeners for date pickers to enable dynamic calculation of the rental price
         startDatePicker.valueProperty().addListener(((observableValue, oldValue, newValue) -> calculatePrice()));
         endDatePicker.valueProperty().addListener(((observableValue, oldValue, newValue) -> calculatePrice()));
+
     }
 
     /**
@@ -263,7 +264,7 @@ public class RentBikeController implements Initializable {
      *
      * @return The total price of the rental.
      */
-    private double calculatePrice() {
+    public double calculatePrice() {  //in order for this method to be tested, it had to be changed from private to public
 
         // Retrieve the start and end dates selected by the user.
         startDate = startDatePicker.getValue();
@@ -284,20 +285,26 @@ public class RentBikeController implements Initializable {
 
                 // Calculate the number of days between the start and end dates, inclusive.
                 long daysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+                if(!(Double.parseDouble(priceField.getText()) <= 0))
+                {
+                    try {
+                        double dailyPrice = Double.parseDouble(priceField.getText());
 
-                try {
-                    double dailyPrice = Double.parseDouble(priceField.getText());
+                        // Calculate the total price for the rental period.
+                        totalPrice = dailyPrice * daysBetween;
 
-                    // Calculate the total price for the rental period.
-                    totalPrice = dailyPrice * daysBetween;
+                        totalPriceLabel.setText(String.format(" %.2f $", totalPrice));
+                        //totalPriceLabel.setText();
+                        return totalPrice;
 
-                    totalPriceLabel.setText(String.format(" %.2f $", totalPrice));
-                    return totalPrice;
-
-                } catch (NumberFormatException e) {
-                    System.out.println("Error in parsing the daily price" + e.getMessage());
-                    totalPriceLabel.setText("");
-                }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Error in parsing the daily price" + e.getMessage());
+                        totalPriceLabel.setText("");
+                    }
+                } else {
+                    //Displays error if price entered is 0 or negative
+                    rentErrorLabel.setText("Bike is of Invalid price, the transaction cannot be completed.");
+                     }
             } else {
                 // Display an error if the end date is before the start date.
                 rentErrorLabel.setText("Please ensure that the end date is not before the start date.");
@@ -309,4 +316,54 @@ public class RentBikeController implements Initializable {
         return totalPrice;
     }
 
+    //thesemethods below have been added to remove the need to make those attributes public
+    public void setStartDatePicker(DatePicker newDatePicker)
+    {
+
+        this.startDatePicker = newDatePicker;
+    }
+
+    public void setEndDatePicker(DatePicker newDatePicker)
+    {
+
+        this.endDatePicker = newDatePicker;
+    }
+
+    public void setPriceField(TextField newPriceField)
+    {
+
+        this.priceField = newPriceField;
+    }
+
+    public void setRentErrorLabel(Label rentErrorLabel) {
+        this.rentErrorLabel = rentErrorLabel;
+    }
+
+    public void setTotalPriceLabel(Label totalPriceLabel) {
+        this.totalPriceLabel = totalPriceLabel;
+    }
+
+    public void setConfirmRentalButton(Button confirmRentalButton) {
+        this.confirmRentalButton = confirmRentalButton;
+    }
+
+    //these methods were added to make setting the dates and prices for calculation easier
+    public void setStartDate(LocalDate date)
+    {
+        this.startDatePicker.setValue(date);
+    }
+
+    public void setEndDate(LocalDate date)
+    {
+        this.endDatePicker.setValue(date);
+    }
+
+    public void setPrice(String price)
+    {
+        this.priceField.setText(price);
+    }
+
+    public String getRentErrorLabel() {
+        return rentErrorLabel.getText();
+    }
 }
