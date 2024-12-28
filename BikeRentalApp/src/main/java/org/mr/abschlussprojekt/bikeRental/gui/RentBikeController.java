@@ -285,26 +285,27 @@ public class RentBikeController implements Initializable {
 
                 // Calculate the number of days between the start and end dates, inclusive.
                 long daysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
-                if(!(Double.parseDouble(priceField.getText()) <= 0))
-                {
-                    try {
-                        double dailyPrice = Double.parseDouble(priceField.getText());
 
+                try {
+                    double dailyPrice = Double.parseDouble(priceField.getText());
+
+                    if(!(dailyPrice <= 0))
+                    {
                         // Calculate the total price for the rental period.
                         totalPrice = dailyPrice * daysBetween;
 
                         totalPriceLabel.setText(String.format(" %.2f $", totalPrice));
-                        //totalPriceLabel.setText();
                         return totalPrice;
-
-                    } catch (NumberFormatException e) {
-                        System.out.println("Error in parsing the daily price" + e.getMessage());
-                        totalPriceLabel.setText("");
+                    } else {
+                        //Displays error if price entered is 0 or negative
+                        rentErrorLabel.setText("Bike is of Invalid price, the transaction cannot be completed.");
                     }
-                } else {
-                    //Displays error if price entered is 0 or negative
-                    rentErrorLabel.setText("Bike is of Invalid price, the transaction cannot be completed.");
-                     }
+
+                } catch (NumberFormatException e) {
+                    System.out.println("Error in parsing the daily price " + e.getMessage());
+                    rentErrorLabel.setText("Error in parsing the daily price " + e.getMessage());
+                    totalPriceLabel.setText("");
+                }
             } else {
                 // Display an error if the end date is before the start date.
                 rentErrorLabel.setText("Please ensure that the end date is not before the start date.");
@@ -366,4 +367,5 @@ public class RentBikeController implements Initializable {
     public String getRentErrorLabel() {
         return rentErrorLabel.getText();
     }
+
 }

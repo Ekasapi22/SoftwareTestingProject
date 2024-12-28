@@ -1,4 +1,4 @@
-package org.mr.abschlussprojekt.bikeRental.gui;
+package org.mr.abschlussprojekt.bikeRental.test;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mr.abschlussprojekt.bikeRental.gui.RentBikeController;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.time.Duration;
@@ -293,34 +294,34 @@ public class RentBikeControllerTest extends ApplicationTest {
         controller.setStartDate(LocalDate.of(2025,3,22));
         controller.setEndDate(LocalDate.of(2026,3,22));
         controller.setPrice("700");
-        Assert.assertEquals(700*366,(int)controller.calculatePrice());
+        Assert.assertEquals(700 * 366,(int)controller.calculatePrice());
 
         controller.setStartDate(LocalDate.of(2029,8,17));
         controller.setEndDate(LocalDate.of(2030,8,17));
         controller.setPrice("400");
-        Assert.assertEquals(400*366,(int)controller.calculatePrice());
+        Assert.assertEquals(400 * 366,(int)controller.calculatePrice());
 
         //Test case 3 & 4 - Price between leap years
         controller.setStartDate(LocalDate.of(2028,4,21));
         controller.setEndDate(LocalDate.of(2029,4,22));
         controller.setPrice("800");
-        Assert.assertEquals(800*367,(int)controller.calculatePrice());
+        Assert.assertEquals(800 * 367,(int)controller.calculatePrice());
 
         controller.setStartDate(LocalDate.of(2032,2,29));
         controller.setEndDate(LocalDate.of(2033,3,1));
         controller.setPrice("700");
-        Assert.assertEquals(700*367,(int)controller.calculatePrice());
+        Assert.assertEquals(700 * 367,(int)controller.calculatePrice());
 
         //Test case 5 & 6 - Price between several years
         controller.setStartDate(LocalDate.of(2025,3,22));
         controller.setEndDate(LocalDate.of(2027,3,22));
         controller.setPrice("700");
-        Assert.assertEquals(700*(365+365+1),(int)controller.calculatePrice());
+        Assert.assertEquals(700 * (365+365+1),(int)controller.calculatePrice());
 
         controller.setStartDate(LocalDate.of(2028,5,27));
         controller.setEndDate(LocalDate.of(2033,5,28));
         controller.setPrice("1300");
-        Assert.assertEquals(1300*(366+365+365+365+366+1),(int)controller.calculatePrice());
+        Assert.assertEquals(1300 * (366+365+365+365+366+1),(int)controller.calculatePrice());
     }
 
     //This method tests the cases when the start date is before the end date
@@ -376,19 +377,19 @@ public class RentBikeControllerTest extends ApplicationTest {
         controller.setEndDate(LocalDate.of(2025,2,27));
         controller.setPrice("73");
         controller.calculatePrice();
-        Assert.assertEquals(73*11,(int)controller.calculatePrice());
+        Assert.assertEquals(73 * 11,(int)controller.calculatePrice());
 
         controller.setStartDate(LocalDate.of(2025,4,22));
         controller.setEndDate(LocalDate.of(2025,5,30));
         controller.setPrice("351");
         controller.calculatePrice();
-        Assert.assertEquals(351*39,(int)controller.calculatePrice());
+        Assert.assertEquals(351 * 39,(int)controller.calculatePrice());
 
         controller.setStartDate(LocalDate.of(2025,3,10));
         controller.setEndDate(LocalDate.of(2025,3,23));
         controller.setPrice("1252");
         controller.calculatePrice();
-        Assert.assertEquals(1252*14,(int)controller.calculatePrice());
+        Assert.assertEquals(1252 * 14,(int)controller.calculatePrice());
 
     }
 
@@ -400,19 +401,19 @@ public class RentBikeControllerTest extends ApplicationTest {
         controller.setEndDate(LocalDate.of(2025,7,25));
         controller.setPrice("25.7");
         controller.calculatePrice();
-        Assert.assertEquals(25.7*15,controller.calculatePrice(),0.1);
+        Assert.assertEquals(25.7 * 15,controller.calculatePrice(),0.1);
 
         controller.setStartDate(LocalDate.of(2025,1,3));
         controller.setEndDate(LocalDate.of(2025,1,19));
         controller.setPrice("134.19");
         controller.calculatePrice();
-        Assert.assertEquals(134.19*17,controller.calculatePrice(),0.1);
+        Assert.assertEquals(134.19 * 17,controller.calculatePrice(),0.1);
 
         controller.setStartDate(LocalDate.of(2025,8,7));
         controller.setEndDate(LocalDate.of(2025,9,25));
         controller.setPrice("2517.378");
         controller.calculatePrice();
-        Assert.assertEquals(2517.378*50,controller.calculatePrice(),0.1);
+        Assert.assertEquals(2517.378 * 50,controller.calculatePrice(),0.1);
 
     }
 
@@ -445,9 +446,82 @@ public class RentBikeControllerTest extends ApplicationTest {
         controller.calculatePrice();
         Assert.assertEquals("Bike is of Invalid price, the transaction cannot be completed.",controller.getRentErrorLabel());
 
-
-
     }
 
+    @Test
+    public void CalculatePriceCoverageTesting()
+    {
+        //Test case 1 & 2 - Normal price calculations section
+        controller.setStartDate(LocalDate.of(2025,2,15));
+        controller.setEndDate(LocalDate.of(2025,2,19));
+        controller.setPrice("135.7");
+        Assert.assertEquals(135.7 * 5,controller.calculatePrice(),0.1);
+
+        controller.setStartDate(LocalDate.of(2025,3,29));
+        controller.setEndDate(LocalDate.of(2025,4,15));
+        controller.setPrice("250");
+        Assert.assertEquals(250 * 18,(int)controller.calculatePrice());
+
+        //Test case 3 - StartDate is null
+        LocalDate nullStart = null;
+        controller.setStartDate(nullStart);
+        controller.setEndDate(LocalDate.now());
+        controller.setPrice("135.7");
+        controller.calculatePrice();
+        Assert.assertEquals("Please select both start and end dates.",controller.getRentErrorLabel());
+
+        //Test case 4 - EndDate is null
+        LocalDate nullEnd = null;
+        controller.setStartDate(LocalDate.now());
+        controller.setEndDate(nullEnd);
+        controller.setPrice("135.7");
+        controller.calculatePrice();
+        Assert.assertEquals("Please select both start and end dates.",controller.getRentErrorLabel());
+
+        //Test case 5 - Both dates are null
+        LocalDate nullStartTwo = null;
+        LocalDate nullEndTwo = null;
+        controller.setStartDate(nullStartTwo);
+        controller.setEndDate(nullEndTwo);
+        controller.setPrice("135.7");
+        controller.calculatePrice();
+        Assert.assertEquals("Please select both start and end dates.",controller.getRentErrorLabel());
+
+        //Test case 6 - End Date is before Start date section
+        controller.setStartDate(LocalDate.now());
+        controller.setEndDate(LocalDate.of(2024,11,1));
+        controller.setPrice("135.7");
+        controller.calculatePrice();
+        Assert.assertEquals("Please ensure that the end date is not before the start date.",controller.getRentErrorLabel());
+
+        //Test case 6 & 7 - Price is of invalid value
+        controller.setStartDate(LocalDate.now());
+        controller.setEndDate(LocalDate.of(2025,3,19));
+        controller.setPrice("0");
+        controller.calculatePrice();
+        Assert.assertEquals("Bike is of Invalid price, the transaction cannot be completed.",controller.getRentErrorLabel());
+
+        controller.setStartDate(LocalDate.of(2025,4,3));
+        controller.setEndDate(LocalDate.of(2025,5,15));
+        controller.setPrice("-3314.759");
+        controller.calculatePrice();
+        Assert.assertEquals("Bike is of Invalid price, the transaction cannot be completed.",controller.getRentErrorLabel());
+
+        //Test case 7 & 9 - Price is of wrong format or not a number section
+        controller.setStartDate(LocalDate.now());
+        controller.setEndDate(LocalDate.of(2025,3,19));
+        controller.setPrice("24.44.33");
+        controller.calculatePrice();
+        Assert.assertEquals("Error in parsing the daily price multiple points", controller.getRentErrorLabel());
+
+        controller.setStartDate(LocalDate.of(2025,4,3));
+        controller.setEndDate(LocalDate.of(2025,5,15));
+        String input = "abcdefg";
+        controller.setPrice(input);
+        controller.calculatePrice();
+        Assert.assertEquals("Error in parsing the daily price For input string: " + "\"" + input + "\"" , controller.getRentErrorLabel());
+    }
+
+    //The above methods focus on the method's behavior rather than implementation
 
 }
