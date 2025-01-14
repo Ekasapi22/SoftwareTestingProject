@@ -16,6 +16,8 @@ module org.rentandroll.mrabschlussprojekt {
     exports org.mr.abschlussprojekt.bikeRental.gui;
     opens org.mr.abschlussprojekt.bikeRental.gui to javafx.fxml;
     exports org.mr.abschlussprojekt.bikeRental.test;
-    opens org.mr.abschlussprojekt.bikeRental.test to javafx.fxml;
+    opens org.mr.abschlussprojekt.bikeRental.test to javafx.fxml, javafx.graphics;
+
+
 
 }

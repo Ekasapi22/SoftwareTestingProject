@@ -26,6 +26,8 @@ public class UserProfileController implements Initializable {
     /*
     Attributes---------------------------------------------------------------*/
 
+    private String resultString;
+
     private UserService userService;
 
     // Current user's ID for personalized actions
@@ -140,7 +142,7 @@ public class UserProfileController implements Initializable {
      * Handles the action of editing user information. Updates the user's name and phone number in the database.
      */
     @FXML
-    void editInfoHandler() {
+    public void editInfoHandler() {
 
         // Retrieve the new name and phone number entered by the user
         String newName = userNameField.getText();
@@ -152,6 +154,7 @@ public class UserProfileController implements Initializable {
 
             // Show a confirmation alert to the user indicating the update was successful
             AlertManager.getInstance().showInformationAlert(AppTexts.UPDATE_SUCCESSFUL,null, AppTexts.SUCCESSFULLY_UPDATED_CONTENT);
+            resultString = AppTexts.SUCCESSFULLY_UPDATED_CONTENT;
 
             // Refresh the displayed user information to reflect the changes made
             showUserInfos();
@@ -162,6 +165,7 @@ public class UserProfileController implements Initializable {
         } catch (Exception e) {
             AlertManager.getInstance().showErrorAlert(AppTexts.UPDATE_FAILED, AppTexts.PROBLEM_UPDATING_USER_INFORMATION_TRY_AGAIN);
             System.out.println("Error in update user info: " + e.getMessage());
+            resultString = "Error in update user info: " + e.getMessage();
         }
 
     }
@@ -216,7 +220,7 @@ public class UserProfileController implements Initializable {
      * It verifies the old password, checks the new password's strength, and updates the password accordingly.
      */
     @FXML
-    void changePasswordHandler() {
+    public void changePasswordHandler() {
         // Retrieve user input for old and new passwords.
         String oldPasswordInput = altPasswordField.getText();
         String newPassword = newPasswordField.getText();
@@ -228,18 +232,21 @@ public class UserProfileController implements Initializable {
             // Validate the strength of the new password.
             if (!Validator.isPasswordStrong(newPassword)) {
                 AlertManager.getInstance().showErrorAlert(AppTexts.VALIDATION_ERROR, AppTexts.NEW_PASSWORD_VALIDATION_FAILED);
+                resultString = AppTexts.NEW_PASSWORD_VALIDATION_FAILED;
                 return;
             }
 
             // Check if the old password input matches the current password.
             if (!currentPassword.equals(oldPasswordInput)) {
                 AlertManager.getInstance().showErrorAlert(AppTexts.INCORRECT_OLD_PASSWORD, AppTexts.THE_OLD_PASSWORD_YOU_ENTERED_IS_INCORRECT);
+                resultString = AppTexts.THE_OLD_PASSWORD_YOU_ENTERED_IS_INCORRECT;
                 return;
             }
             // Change the user's password to the new password.
             userService.changeUserPassword(currentUserId, newPassword);
             // Display a success alert.
             AlertManager.getInstance().showInformationAlert(AppTexts.PASSWORD_CHANGE, null, AppTexts.PASSWORD_SUCCESSFULLY_CHANGED);
+            resultString = AppTexts.PASSWORD_SUCCESSFULLY_CHANGED;
             clearPasswordFields(); // Clear the password input fields.
 
             // Disable the change password and cancel buttons post-success.
@@ -249,6 +256,7 @@ public class UserProfileController implements Initializable {
         } catch (Exception e) {
             // Display an error alert if the password change fails.
             AlertManager.getInstance().showErrorAlert(AppTexts.PASSWORD_CHANGE_ERROR, AppTexts.FAILED_TO_CHANGE_PASSWORD);
+            resultString = e.getMessage();
         }
 
     }
@@ -414,5 +422,91 @@ public class UserProfileController implements Initializable {
         }
     }
 
+    public void setUserService(UserService newUserService)
+    {
+        this.userService = newUserService;
+    }
+
+    public void setAltPasswordField(PasswordField altPasswordField) {
+        this.altPasswordField = altPasswordField;
+    }
+
+    public void setNewPasswordField(PasswordField newPasswordField) {
+        this.newPasswordField = newPasswordField;
+    }
+
+    public void setCancelChangePassButton(Button cancelChangePassButton) {
+        this.cancelChangePassButton = cancelChangePassButton;
+    }
+
+    public void setChangePasswordButton(Button changePasswordButton) {
+        this.changePasswordButton = changePasswordButton;
+    }
+
+    public void setCurrentUserId(int newUserId)
+    {
+        this.currentUserId = newUserId;
+    }
+
+    public void setAltPasswordFieldText(String text)
+    {
+        this.altPasswordField.setText(text);
+    }
+
+    public void setNewPasswordFieldText(String text)
+    {
+        this.newPasswordField.setText(text);
+    }
+
+    public void setConfirmPasswordField(PasswordField newPasswordField )
+    {
+        this.confirmNewPasswordField = newPasswordField;
+    }
+
+    public void setErrorLabel(Label newlabel)
+    {
+        this.errorLabel = newlabel;
+    }
+
+    public String getResultString()
+    {
+        return this.resultString;
+    }
+
+    public void setUserNameField(TextField newField)
+    {
+        this.userNameField = newField;
+    }
+
+    public void setUserPhoneField(TextField userPhoneField) {
+        this.userPhoneField = userPhoneField;
+    }
+
+    public void setEditButton(Button newButton)
+    {
+        this.editButton = newButton;
+    }
+
+    public void setCancelEditButton(Button newButton)
+    {
+        this.cancelEditButton = newButton;
+    }
+
+    public void setUserNameTextValue(String username)
+    {
+        this.userNameField.setText(username);
+    }
+
+    public void setPhoneNumberTextValue(String phone)
+    {
+        this.userPhoneField.setText(phone);
+    }
+
+    public void setUserEmailField(TextField newField)
+    {
+        this.userEmailField = newField;
+    }
 
 }
+
+

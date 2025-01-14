@@ -1,5 +1,7 @@
 package org.mr.abschlussprojekt.bikeRental.test;
 
+import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
@@ -10,9 +12,15 @@ import javafx.stage.Stage;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mr.abschlussprojekt.bikeRental.Main;
+import org.mr.abschlussprojekt.bikeRental.database.services.RentService;
+import org.mr.abschlussprojekt.bikeRental.database.services.UserService;
 import org.mr.abschlussprojekt.bikeRental.gui.RentBikeController;
+import org.mr.abschlussprojekt.bikeRental.logic.ChangeSceneManager;
+import org.testfx.api.FxRobot;
 import org.testfx.framework.junit.ApplicationTest;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,12 +31,12 @@ import java.time.LocalTime;
 
 
 
-/* these are for mockito
+/* these are for mockito*/
 import org.mockito.Mockito;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
-*/
+
 
 public class RentBikeControllerTest extends ApplicationTest {
 
@@ -42,12 +50,19 @@ public class RentBikeControllerTest extends ApplicationTest {
     */
 
 
-    @Override
-    public void start(Stage stage)
+    @Before
+    public void setUpClass() throws Exception
     {
-        stage.setScene(new Scene(new StackPane(), 100, 100));
+        ApplicationTest.launch(Main.class);
+    }
+
+    @Override
+    public void start(Stage stage) throws IOException
+    {
+        //ChangeSceneManager.getInstance().switchToUserHome();
         stage.show();
     }
+
 
     @Before
     public void setupCalculatePrice()
@@ -494,7 +509,7 @@ public class RentBikeControllerTest extends ApplicationTest {
         controller.calculatePrice();
         Assert.assertEquals("Please ensure that the end date is not before the start date.",controller.getRentErrorLabel());
 
-        //Test case 6 & 7 - Price is of invalid value
+        //Test case 7 & 8 - Price is of invalid value
         controller.setStartDate(LocalDate.now());
         controller.setEndDate(LocalDate.of(2025,3,19));
         controller.setPrice("0");
@@ -507,7 +522,7 @@ public class RentBikeControllerTest extends ApplicationTest {
         controller.calculatePrice();
         Assert.assertEquals("Bike is of Invalid price, the transaction cannot be completed.",controller.getRentErrorLabel());
 
-        //Test case 7 & 9 - Price is of wrong format or not a number section
+        //Test case 9 & 10 - Price is of wrong format or not a number section
         controller.setStartDate(LocalDate.now());
         controller.setEndDate(LocalDate.of(2025,3,19));
         controller.setPrice("24.44.33");

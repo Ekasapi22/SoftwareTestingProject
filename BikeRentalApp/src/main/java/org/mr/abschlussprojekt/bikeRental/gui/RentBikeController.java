@@ -70,7 +70,7 @@ public class RentBikeController implements Initializable {
     @FXML
     private Label rentErrorLabel;
     @FXML
-    private Button confirmRentalButton;
+    public Button confirmRentalButton;
 
     /*
     FXML-Initialisierungsmethod---------------------------------------------------------*/
@@ -142,7 +142,7 @@ public class RentBikeController implements Initializable {
      * and updates the database with the rental information if confirmed by the user.
      */
     @FXML
-    void handleRenting(ActionEvent event) {
+    public void handleRenting(ActionEvent event) {
 
         int userId = CurrentUser.getInstance().getUserId();
 
@@ -366,6 +366,26 @@ public class RentBikeController implements Initializable {
 
     public String getRentErrorLabel() {
         return rentErrorLabel.getText();
+    }
+
+    public void setCurrentBike(Bike currentBike) {
+        this.currentBike = currentBike;
+    }
+
+    public void setRentService(RentService rentService) {
+        this.rentService = rentService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    public void setStatusService(StatusService statusService) {
+        this.statusService = statusService;
+    }
+
+    public void setStationService(StationService stationService) {
+        this.stationService = stationService;
     }
 
 }
