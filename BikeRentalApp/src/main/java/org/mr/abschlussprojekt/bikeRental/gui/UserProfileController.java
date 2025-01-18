@@ -27,6 +27,7 @@ public class UserProfileController implements Initializable {
     Attributes---------------------------------------------------------------*/
 
     private String resultString;
+    private boolean userClickedOk = false;
 
     private UserService userService;
 
@@ -185,27 +186,52 @@ public class UserProfileController implements Initializable {
      * If the user confirms, it attempts to delete the user account and provides feedback.
      */
     @FXML
-    void deleteAccountHandler() {
+    public void deleteAccountHandler() {
 
-        // Show a confirmation dialog to make sure the user really wants to delete their account.
-        Optional<ButtonType> result = AlertManager.getInstance().showConfirmationAlert(AppTexts.DELETE_USER, null, AppTexts.WANT_TO_DELETE_THIS_USER);
+        if(!userClickedOk)
+        {
+            Optional<ButtonType> result = AlertManager.getInstance().showConfirmationAlert(AppTexts.DELETE_USER, null, AppTexts.WANT_TO_DELETE_THIS_USER);
 
-        // Check if the user confirmed the deletion.
-        if (result.isPresent() && result.get() == ButtonType.OK){
+
+            // Check if the user confirmed the deletion.
+            if (result.isPresent() && result.get() == ButtonType.OK){
+                //to make sure the other tests will be consistent and wait for a button click
+
+
+                try{
+                    // Attempt to delete the user account using the userService.
+                    userService.deleteUser(currentUserId);
+                    // Show an informational alert to indicate successful deletion.
+                    AlertManager.getInstance().showInformationAlert(AppTexts.DELETION_SUCCESSFUL, null , AppTexts.BEEN_SUCCESSFULLY_DELETED);
+
+                } catch (RuntimeException e){
+                    // If the deletion fails, show an error alert with details.
+                    AlertManager.getInstance().showErrorAlert(AppTexts.DELETION_FAILED, AppTexts.PROBLEM_DELETING_THE_USER_TRY_AGAIN);
+                }
+            }
+        }else
+        {
+            userClickedOk = false;
 
             try{
                 // Attempt to delete the user account using the userService.
                 userService.deleteUser(currentUserId);
                 // Show an informational alert to indicate successful deletion.
                 AlertManager.getInstance().showInformationAlert(AppTexts.DELETION_SUCCESSFUL, null , AppTexts.BEEN_SUCCESSFULLY_DELETED);
+                resultString = AppTexts.BEEN_SUCCESSFULLY_DELETED;
 
             } catch (RuntimeException e){
                 // If the deletion fails, show an error alert with details.
                 AlertManager.getInstance().showErrorAlert(AppTexts.DELETION_FAILED, AppTexts.PROBLEM_DELETING_THE_USER_TRY_AGAIN);
+                resultString = AppTexts.PROBLEM_DELETING_THE_USER_TRY_AGAIN;
             }
         }
 
+
+
     }
+
+
 
     private void clearPasswordFields() {
 
@@ -506,6 +532,13 @@ public class UserProfileController implements Initializable {
     {
         this.userEmailField = newField;
     }
+
+    public void setUserClickedOk(boolean b)
+    {
+        this.userClickedOk = b;
+    }
+
+
 
 }
 

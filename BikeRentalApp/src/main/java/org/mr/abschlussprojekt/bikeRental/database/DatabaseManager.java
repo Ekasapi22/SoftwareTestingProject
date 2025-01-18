@@ -44,6 +44,7 @@ public class DatabaseManager {
         return connection;
     }
 
+
     /**
      * Open a connection to the database if it is not already open.
      */
@@ -51,7 +52,7 @@ public class DatabaseManager {
         try {
             if (connection == null || connection.isClosed()) {
                 //Replace "AppTexts.DB_CONNECTION_URL" and "AppTexts.DB_USER_NAME" and "Password" with your actual database credentials.
-                connection = DriverManager.getConnection(AppTexts.DB_CONNECTION_URL,"root", "");
+                connection = DriverManager.getConnection(AppTexts.TEST_DB_CONNECTION_URL,"root", "");
 
                 isConnected = true;
             }

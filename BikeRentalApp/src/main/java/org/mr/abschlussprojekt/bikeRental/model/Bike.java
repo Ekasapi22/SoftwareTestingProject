@@ -1,6 +1,8 @@
 package org.mr.abschlussprojekt.bikeRental.model;
 
 import javafx.beans.property.*;
+import org.mr.abschlussprojekt.bikeRental.database.services.BikeService;
+import org.mr.abschlussprojekt.bikeRental.database.services.StationService;
 import org.mr.abschlussprojekt.bikeRental.setting.AppTexts;
 
 /**
@@ -18,6 +20,8 @@ public class Bike {
     private double bikePrice;
     private final ObjectProperty<BikeStatus> bikeStatus;
     private final StringProperty bikeLocation;
+
+    private final StationService service = new StationService();
 
      /*
     Constructors
@@ -116,6 +120,8 @@ public class Bike {
     public StringProperty bikeLocationProperty() {
         return bikeLocation;
     }
+
+
     public void setBikeLocation(String bikeLocation) {
         validateNonNull(bikeLocation , "Bike Location");
         this.bikeLocation.set(bikeLocation);

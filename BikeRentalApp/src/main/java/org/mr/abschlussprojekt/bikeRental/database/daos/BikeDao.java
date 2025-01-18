@@ -2,18 +2,20 @@ package org.mr.abschlussprojekt.bikeRental.database.daos;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.mr.abschlussprojekt.bikeRental.database.services.StationService;
 import org.mr.abschlussprojekt.bikeRental.model.*;
 import org.mr.abschlussprojekt.bikeRental.setting.AppTexts;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * Handles database operations for bikes, including loading, updating, and deleting bike records.
  */
 public class BikeDao {
+
+    //added for testing purposes
+    private static final StationService stationService = new StationService();
+
 
     /*
     Constants
@@ -23,6 +25,9 @@ public class BikeDao {
 
     // SQL query to select bike details and join with the stations table to get the station address.
     public static final String READ_ALL_BIKES_SQL = "SELECT b.bike_id, b.bike_model, b.bike_type, b.bike_price, b.bike_status, s.station_address FROM bikes b JOIN stations s ON b.station_id = s.station_id";
+
+    //SQL statement that retrieves all bike info by id
+    public static final String SELECT_Bike_BY_ID_SQL = "SELECT * FROM bikes WHERE bike_id = ?";
 
     // SQL query to check the current status of the bike.
     public static final String CHECK_STATUS_SQL = "SELECT bike_status FROM bikes WHERE bike_id = ?";
@@ -62,6 +67,80 @@ public class BikeDao {
             System.out.println("Error while add new Bike " + e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    public static int addNewBikeAndGetId(String model, BikeType type, double price, int stationId, BikeStatus statusInserted, Connection connection) {
+
+        ResultSet rs = null;
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_BIKES_SQL, Statement.RETURN_GENERATED_KEYS)) {
+
+
+
+            preparedStatement.setString(1, model);
+            preparedStatement.setString(2, type.toString());
+            preparedStatement.setDouble(3, price);
+            preparedStatement.setInt(4, stationId);
+            preparedStatement.setString(5, statusInserted.toString());
+
+            // Executes the SQL statement to insert the new bike.
+            int affectedRows = preparedStatement.executeUpdate();
+
+            if(affectedRows > 0)
+            {
+                rs = preparedStatement.getGeneratedKeys();
+                if(rs.next())
+                {
+                    return rs.getInt(1);
+                }
+            }
+
+
+        } catch (SQLException e) {
+            System.out.println("Error while add new Bike " + e.getMessage());
+            //throw new RuntimeException(e);
+            return  -1;
+        }finally {
+            if(rs!=null)
+            {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return -1;
+    }
+
+
+    public static Bike getBikeById(int bikeId, Connection connection)
+    {
+
+        Bike bike = null;
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(SELECT_Bike_BY_ID_SQL))
+        {
+            preparedStatement.setInt(1, bikeId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                // Instantiate a new User object and populate it with the query results
+                bike = new Bike();
+                bike.setBikeId(resultSet.getInt(AppTexts.BIKE_ID_COLUMN_DB));
+                bike.setBikeModel(resultSet.getString(AppTexts.BIKE_MODEL_COLUMN_DB));
+                bike.setBikeLocation(stationService.getStationLocationById(resultSet.getInt(AppTexts.STATION_ID_COLUMN_DB)));
+                bike.setBikePrice(resultSet.getDouble(AppTexts.BIKE_PRICE_COLUMN_DB));
+                bike.setBikeStatus(BikeStatus.valueOf(resultSet.getString(AppTexts.BIKE_STATUS_COLUMN_DB)));
+                bike.setBikeType(BikeType.valueOf(resultSet.getString(AppTexts.BIKE_TYPE_COLUMN_DB)));
+            }
+
+        }catch (SQLException e) {
+            System.out.println("Error retrieving bike by ID: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return bike;
     }
 
     /**
@@ -176,6 +255,7 @@ public class BikeDao {
             throw new RuntimeException(e);
         }
     }
+
 
 
 }

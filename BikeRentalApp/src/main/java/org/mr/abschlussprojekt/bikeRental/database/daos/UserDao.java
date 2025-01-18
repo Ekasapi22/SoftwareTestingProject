@@ -91,6 +91,8 @@ public class UserDao {
 
         ResultSet rs = null;
 
+
+
         try (PreparedStatement pstmt = connection.prepareStatement(INSERT_NEW_USER_INTO_USERS_SQL, Statement.RETURN_GENERATED_KEYS)) {
             // Setting the prepared statement parameters.
             pstmt.setString(1, userName);

@@ -3,9 +3,13 @@ package org.mr.abschlussprojekt.bikeRental.database.services;
 import javafx.collections.ObservableList;
 import org.mr.abschlussprojekt.bikeRental.database.DatabaseManager;
 import org.mr.abschlussprojekt.bikeRental.database.daos.UserDao;
+import org.mr.abschlussprojekt.bikeRental.logic.AlertManager;
 import org.mr.abschlussprojekt.bikeRental.model.User;
+import org.mr.abschlussprojekt.bikeRental.setting.AppTexts;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class UserService {
 
@@ -14,6 +18,9 @@ public class UserService {
     public UserService(){
         this.connection = DatabaseManager.getInstance().getConnection();
     }
+
+
+
 
     public void addNewUser(String name, String phone, String email, String password) {
         UserDao.addNewUser(name, phone, email, password, connection);
@@ -54,4 +61,6 @@ public class UserService {
     public void deleteUser(int id) {
         UserDao.deleteUser(id, connection);
     }
+
+
 }

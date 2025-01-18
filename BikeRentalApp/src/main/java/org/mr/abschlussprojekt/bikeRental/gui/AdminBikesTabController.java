@@ -42,6 +42,10 @@ public class AdminBikesTabController implements Initializable {
     private Bike selectedBike; // Currently selected bike for edit
     private boolean isEditMode = false;
 
+    private boolean clickedOk = false;
+
+    public int currentRegisteredBike;
+
 
     /*
    FXML UI Elements---------------------------------------------------------*/
@@ -156,7 +160,7 @@ public class AdminBikesTabController implements Initializable {
      * This method updates the information of the selected bike with the new values entered by the user.
      */
     @FXML
-    void updateBikeHandler(ActionEvent event) {
+    public void updateBikeHandler(ActionEvent event) {
         if (selectedBike != null) { // Check if a bike is selected for editing.
             try {
                 // Extract new bike information from the form fields.
@@ -321,7 +325,7 @@ public class AdminBikesTabController implements Initializable {
      * Switches the UI to add mode, preparing it for entering a new bike.
      * It clears the form and resets the state, disabling the update button and enabling the add button.
      */
-    private void switchToAddMode() {
+    public void switchToAddMode() {
         isEditMode = false; // Indicate that the form is now in add mode, not edit mode.
         selectedBike = null; // Clear the selected bike as we're not editing an existing one.
         updateButtonStates(); // Update the states of the buttons based on the current form mode.
@@ -352,7 +356,7 @@ public class AdminBikesTabController implements Initializable {
      *
      * @param bike The bike selected for editing.
      */
-    private void populateFieldsForEditing(Bike bike) {
+    public void populateFieldsForEditing(Bike bike) {
 
         isEditMode = true;
         selectedBike = bike;
@@ -420,7 +424,7 @@ public class AdminBikesTabController implements Initializable {
     /**
      * Creates a new bike entry in the database with the information provided in the form fields.
      */
-    private void createNewBike() {
+    public void createNewBike() {
 
         switchToAddMode(); // Ensures the UI is in the correct state for adding a new bike
 
@@ -445,7 +449,7 @@ public class AdminBikesTabController implements Initializable {
             double bikePriceInserted = Double.parseDouble(bikePriceField.getText());
 
             // add the new bike to the database
-            bikeService.addNewBike(bikeModelInserted, selectedType, bikePriceInserted, stationId, statusInserted);
+            currentRegisteredBike = bikeService.addNewBikeAndGetId(bikeModelInserted, selectedType, bikePriceInserted, stationId, statusInserted);
 
             clearTxtFieldsAndDisableBtns(); // Resets the form fields
 
@@ -532,12 +536,34 @@ public class AdminBikesTabController implements Initializable {
      *
      * @param bike The bike object to be deleted.
      */
-    private void deleteBike(Bike bike) {
+    public void deleteBike(Bike bike) {
 
-        // Confirm with the user before proceeding with deletion
-        Optional<ButtonType> result = AlertManager.getInstance().showConfirmationAlert("Delete Bike", null, "Are you sure you want to delete this Bike?");
+        if(!clickedOk)
+        {
+            // Confirm with the user before proceeding with deletion
+            Optional<ButtonType> result = AlertManager.getInstance().showConfirmationAlert("Delete Bike", null, "Are you sure you want to delete this Bike?");
 
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (result.isPresent() && result.get() == ButtonType.OK || clickedOk ) {
+
+                try {
+
+                    // Attempt to delete the bike from the database
+                    bikeService.deleteBikeFromDB(bike.getBikeId());
+
+                    listOfBikes.remove(bike); // Remove the bike from the displayed list
+                    addButton.requestFocus(); // Refocus on the add button
+
+                    // Inform the user of successful deletion
+                    AlertManager.getInstance().showInformationAlert("Deletion Successful", null, "Bike has been successfully deleted.");
+
+                } catch (RuntimeException e) {
+                    // Inform the user of a failure to delete the bike
+                    AlertManager.getInstance().showErrorAlert("Deletion Failed", "There was a problem deleting the bike. Please try again.");
+                }
+            }
+        }else
+        {
+            clickedOk = false;
 
             try {
 
@@ -555,8 +581,106 @@ public class AdminBikesTabController implements Initializable {
                 AlertManager.getInstance().showErrorAlert("Deletion Failed", "There was a problem deleting the bike. Please try again.");
             }
         }
+
+
         addButton.requestFocus();
     }
+
+    public void activateListOfBikes() //very important
+    {
+        this.listOfBikes = bikeService.loadAllBikes();
+
+        this.bikeIdColumn = new TableColumn<>();
+        this.bikeModelColumn = new TableColumn<>();
+        this.bikePriceColumn = new TableColumn<>();
+        this.bikeStationColumn = new TableColumn<>();
+        this.bikeTypeColumn =new TableColumn<>();
+        this.bikeStatusColumn = new TableColumn<>();
+
+        this.bikesTable =new TableView<>(listOfBikes);
+    }
+
+    public void setBikeService(BikeService bikeService)
+    {
+        this.bikeService = new BikeService();
+    }
+
+    public void setStationService(StationService stationService) {
+        this.stationService = stationService;
+    }
+
+    public void actuallyClickedOk()
+    {
+        this.clickedOk = true;
+    }
+
+    public void setAddButton(Button button) {
+        this.addButton = new Button();
+    }
+
+
+    public void setBikeModelField(TextField bikeModelField) {
+        this.bikeModelField = bikeModelField;
+    }
+
+    public void setBikeModelTextFieldVal(String val)
+    {
+        this.bikeModelField.setText(val);
+    }
+
+    public void setBikeTypeComboBox(ComboBox<BikeType> bikeTypeComboBox) {
+        this.bikeTypeComboBox = bikeTypeComboBox;
+    }
+
+    public void setBikeTypeVal(BikeType val)
+    {
+        bikeTypeComboBox.setValue(val);
+    }
+
+    public void setBikeStatusComboBox(ComboBox<BikeStatus> bikeStatusComboBox) {
+        this.bikeStatusComboBox = bikeStatusComboBox;
+    }
+
+    public void setBikeStatusVal(BikeStatus status)
+    {
+        this.bikeStatusComboBox.setValue(status);
+    }
+
+    public void setStationComboBox(ComboBox<Station> stationComboBox) {
+        this.stationComboBox = stationComboBox;
+    }
+
+    public void setStationValById(int id)
+    {
+
+        this.stationComboBox.setValue(new Station(id, stationService.getStationLocationById(id)));
+    }
+
+    public void setBikePriceField(TextField bikePriceField) {
+        this.bikePriceField = bikePriceField;
+    }
+
+    public void setBikePriceFieldVal(String pricetext)
+    {
+        this.bikePriceField.setText(pricetext);
+    }
+
+    public void setTipText(Label tipText) {
+        this.tipText = tipText;
+    }
+
+    public void setErrorLabel(Label errorLabel) {
+        this.errorLabel = errorLabel;
+    }
+
+    public void setCancelButton(Button cancelButton) {
+        this.cancelButton = cancelButton;
+    }
+
+    public void setUpdateButton(Button updateButton) {
+        this.updateButton = updateButton;
+    }
+
 
 
 }

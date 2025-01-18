@@ -1,6 +1,7 @@
 package org.mr.abschlussprojekt.bikeRental.logic;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
@@ -12,6 +13,7 @@ import java.util.Optional;
 public class AlertManager {
 
     private static AlertManager instance; // Singleton instance
+
 
     // Private constructor to prevent instantiation.
     private AlertManager() {
@@ -58,6 +60,9 @@ public class AlertManager {
         confirmAlert.setContentText(contentTxt);
         return confirmAlert.showAndWait();
     }
+
+
+
 
     /**
      * Displays an information alert dialog with a specified title, header, and content message.

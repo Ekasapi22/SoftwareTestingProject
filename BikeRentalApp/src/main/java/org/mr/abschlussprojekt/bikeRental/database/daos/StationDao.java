@@ -24,6 +24,8 @@ public class StationDao {
     // Fetches the ID of a station by its address.
     public static final String SELECT_STATION_ID_BY_ITS_ADDRESS_SQL = "SELECT station_id FROM stations WHERE station_address = ?";
 
+    public static final String SELECT_STATION_LOCATION_BY_ID_SQL = "SELECT station_address FROM stations WHERE  station_id = ?";
+
     /*----------------------------------------------------------------------------------------------------------- */
 
 
@@ -80,6 +82,27 @@ public class StationDao {
             }
         } catch (SQLException e) {
             System.out.println("Error while fetching station ID: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getStationLocationByID(int stationId, Connection connection) {
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_STATION_LOCATION_BY_ID_SQL)) {
+
+            preparedStatement.setInt(1, stationId );
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                // Return the station ID of the first (and should be only) match
+                return resultSet.getString(AppTexts.STATION_ADDRESS_COLUMN_DB);
+
+            } else {
+                // If no result is found, throw an exception
+                throw new RuntimeException("No station found with the given address: " + stationId);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error while fetching station Location: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

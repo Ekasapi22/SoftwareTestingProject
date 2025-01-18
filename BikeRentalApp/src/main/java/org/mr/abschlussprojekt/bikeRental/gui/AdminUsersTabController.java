@@ -31,12 +31,15 @@ public class AdminUsersTabController implements Initializable {
    Attributes---------------------------------------------------------------*/
 
     private UserService userService;
+    private boolean userClickedOk = false;
 
     // List to store users fetched from the database.
     private ObservableList<User> listOfUsers;
 
     private boolean isEditMode = false;
     private User selectedUser;
+
+    public int registeredUser;
 
     /*
    FXML UI Elements---------------------------------------------------------*/
@@ -75,7 +78,7 @@ public class AdminUsersTabController implements Initializable {
     private TableColumn<User, String> userPhoneColumn;
 
     @FXML
-    private Button addButton;
+    public Button addButton;
     @FXML
     private Button cancelButton;
 
@@ -241,7 +244,7 @@ public class AdminUsersTabController implements Initializable {
 
 
     // Creates a new user based on input fields.
-    private void createNewUser() {
+    public void createNewUser() {
 
         isEditMode = false;
 
@@ -254,7 +257,7 @@ public class AdminUsersTabController implements Initializable {
         // Check if email is available before creating a new user.
         if (userService.isEmailAvailable(emailInserted)) {
             try {
-                userService.addNewUser(userNameInserted, phoneInserted, emailInserted, passwordInserted);
+               registeredUser = userService.registerUserAndGetId(userNameInserted, phoneInserted, emailInserted, passwordInserted);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 throw new RuntimeException(e);
@@ -328,7 +331,7 @@ public class AdminUsersTabController implements Initializable {
      *
      * @param user The user to be edited.
      */
-    private void editUser(User user) {
+    public void editUser(User user) {
 
         // Set the currently selected user to the user to be edited
         selectedUser = user;
@@ -346,6 +349,7 @@ public class AdminUsersTabController implements Initializable {
         tipText.setMaxWidth(200);
 
         // Change the text of the addButton to "Update" to reflect the current action
+
         addButton.setText("Update");
         addButton.setOnAction(event -> { // Set the action of the addButton to call updateUser() when clicked
             updateUser();
@@ -367,7 +371,7 @@ public class AdminUsersTabController implements Initializable {
     /**
      * Updates the user's information in the database with the new data entered in the form.
      */
-    private void updateUser() {
+    public void updateUser() {
 
         // Check if there is a selected user to update
         if (selectedUser != null) {
@@ -402,14 +406,21 @@ public class AdminUsersTabController implements Initializable {
      *
      * @param user The user to be deleted.
      */
-    private void deleteUser(User user) {
+    public void deleteUser(User user) {
 
-        // Display a confirmation dialog to ensure the admin wants to proceed with deletion.
-        Optional<ButtonType> result = AlertManager.getInstance().showConfirmationAlert(AppTexts.DELETE_USER, null, AppTexts.WANT_TO_DELETE_THIS_USER);
+        if(!userClickedOk)
+        {
+            // Display a confirmation dialog to ensure the admin wants to proceed with deletion.
+            Optional<ButtonType> result = AlertManager.getInstance().showConfirmationAlert(AppTexts.DELETE_USER, null, AppTexts.WANT_TO_DELETE_THIS_USER);
 
-        // Proceed with deletion if the admin confirms the action.
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+            // Proceed with deletion if the admin confirms the action. the userclickedOk was added to access this method
+            if (result.isPresent() && result.get() == ButtonType.OK) {
 
+
+            }
+            // Ensure the "Add" button is focused even if the admin cancels the deletion.
+
+        }else {
             try {
 
                 // Attempt to delete the user from the database using the user's ID.
@@ -425,9 +436,88 @@ public class AdminUsersTabController implements Initializable {
                 AlertManager.getInstance().showErrorAlert(AppTexts.DELETION_FAILED, AppTexts.PROBLEM_DELETING_THE_USER_TRY_AGAIN);
             }
         }
-        // Ensure the "Add" button is focused even if the admin cancels the deletion.
-        addButton.requestFocus();
+
+            addButton.requestFocus();
     }
+
+    //setters for the deleteUser method
+    public void setUserService(UserService newService)
+    {
+        this.userService = newService;
+    }
+
+    public void activateListOfUsers()
+    {
+        this.listOfUsers = userService.loadAllUsers();
+
+        this.userIdColumn = new TableColumn<>();
+        this.userNameColumn = new TableColumn<>();
+        this.userEmailColumn = new TableColumn<>();
+        this.userPhoneColumn = new TableColumn<>();
+        this.userPasswordColumn = new TableColumn<>();
+
+        this.usersTable = new TableView<>();
+    }
+
+    public void activateAddButton()
+    {
+        this.addButton = new Button();
+    }
+
+    public void setUserClickedOk(boolean bool)
+    {
+        this.userClickedOk = bool;
+    }
+
+    public void setUserNameField(TextField userNameField) {
+        this.userNameField = userNameField;
+    }
+
+    public void setUserNameFieldValue(String val)
+    {
+        this.userNameField.setText(val);
+    }
+
+    public void setUserPhoneField(TextField newField)
+    {
+        this.userPhoneField = newField;
+    }
+
+    public void setUserPhoneFieldValue(String val)
+    {
+        this.userPhoneField.setText(val);
+    }
+
+    public void setUserEmailField(TextField newField)
+    {
+        this.userEmailField = newField;
+    }
+
+    public void setUserEmailFieldValue(String val)
+    {
+        this.userEmailField.setText(val);
+    }
+
+    public void setUserPasswordField(TextField newField)
+    {
+        this.userPasswordField = newField;
+    }
+
+    public void setUserPasswordFieldValue(String val)
+    {
+        this.userPasswordField.setText(val);
+    }
+
+    public void setCancelButton(Button button)
+    {
+        this.cancelButton = button;
+    }
+
+    public void setTipText(Label newLabel)
+    {
+        this.tipText = newLabel;
+    }
+
 
 
 }

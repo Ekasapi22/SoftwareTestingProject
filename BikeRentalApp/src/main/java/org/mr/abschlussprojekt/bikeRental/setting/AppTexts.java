@@ -10,6 +10,8 @@ public class AppTexts {
 
 
     public static final String DB_CONNECTION_URL = "jdbc:mariadb://localhost/BikeRentalDB";
+    public static final String TEST_DB_CONNECTION_URL = "jdbc:mariadb://localhost/bikerentaldbtesting";
+
     public static final String DB_USER_NAME = "root";
 
 
